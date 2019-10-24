@@ -35,13 +35,14 @@ app.use(function validateBearerToken(req, res, next){
 
 //To call on this we need to set up an endpoint on our server to respond
 let handleGetRequests = (req, res) => {
+  
   let response = movieDB.movies
 
   function checkRating(num){
     let rating = req.query.rating
     
     if (rating === " " || isNaN(rating)){
-      return res.status(401).json({ error: 'Please provide a number request'})
+      return res.status(401).json({ error: 'Please provide a number in the request'})
     }
 
     console.log(num >=Number(rating)) 
@@ -52,18 +53,15 @@ let handleGetRequests = (req, res) => {
   if(req.query.genre){
     console.log('running genre filter')
     
-    console.log(response)
-    response = response.filter( (movies) =>{
-      
-      movies.genre.toLowerCase().includes(req.query.genre.toLowerCase())
+    debugger
+    response = response.filter( movies =>{
+     return movies.genre.toLowerCase().includes(req.query.genre.toLowerCase())
     })
-
-    
   }
     
   if(req.query.country){
-    response = response.filter( (movies, index) => {
-      movies[index].country.toLowerCase().includes(req.query.country.toLowerCase())
+    response = response.filter( movies => {
+      movies.country.toLowerCase().includes(req.query.country.toLowerCase())
     })
   }
 
