@@ -54,13 +54,13 @@ let handleGetRequests = (req, res) => {
 
   function checkRating(num){
     
-    let rating = req.query.rating;
+    let avg_vote = req.query.avg_vote;
 
-    if (rating === " " || isNaN(rating)){
+    if (avg_vote === " " || isNaN(avg_vote)){
       return res.status(401).json({ error: 'Please provide a number in the request'});
     }
 
-    return num >= Number(rating);
+    return num >= Number(avg_vote);
     
   }
 
@@ -85,9 +85,9 @@ let handleGetRequests = (req, res) => {
 
   }
 
-  if(req.query.rating){
+  if(req.query.avg_vote){
     
-    console.log('running rating filter')
+    console.log('running avg_vote filter')
 
     response = response.filter((movies) => {
       return checkRating(movies.avg_vote);
