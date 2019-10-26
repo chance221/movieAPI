@@ -1,11 +1,21 @@
 require('dotenv').config();
-const express = require('express')
-const morgan = require('morgan')
-const movieDB = require('./movies-data-small.json')
+
+const express = require('express');
+
+const morgan = require('morgan');
+
+const movieDB = require('./movies-data-small.json');
+
+const cors = require('cors');
+
+const helmet = require('helmet');
 
 const app = express();
 
 const morganSetting = process.env.NODE_ENV === 'production' ? 'tiny' : 'common'
+
+app.use(helmet());
+app.use(cors());
 
 app.use(morgan(morganSetting))
 
@@ -39,54 +49,68 @@ app.use(function validateBearerToken(req, res, next){
 
   next()
 
-})
+});
 
 //Now we have a server set up we can create the callback function that we want to run seperately
 
 //The callback function is defined here. 
 
 //To call on this we need to set up an endpoint on our server to respond
+
 let handleGetRequests = (req, res) => {
   
   let response = movieDB.movies
 
   function checkRating(num){
-    let rating = req.query.rating
     
-    if (rating === " " || isNaN(rating)){
-      return res.status(401).json({ error: 'Please provide a number in the request'})
+    let avg_vote = req.query.avg_vote;
+
+    if (avg_vote === " " || isNaN(avg_vote)){
+      return res.status(401).json({ error: 'Please provide a number in the request'});
     }
 
-    return num >= Number(rating)
+    return num >= Number(avg_vote)
   }
 
   //need to set up if statement to accept queries by genre, country, agv vote
   if(req.query.genre){
     response = response.filter( movies =>{
-     return movies.genre.toLowerCase().includes(req.query.genre.toLowerCase())
+      return movies.genre.toLowerCase().includes(req.query.genre.toLowerCase());
     })
+
   }
     
   if(req.query.country){
+
     response = response.filter( movies => {
       return movies.country.toLowerCase().includes(req.query.country.toLowerCase())
     })
+
   }
 
   if(req.query.rating){
     response = response.filter((movies, index) => {
       return checkRating(movies.avg_vote)
     })
+
   }
-  res.json(response)
-}
+
+  if(response.length > 0 ){
+    res.json(response);
+  }
+
+  else{
+    res.send('No results found. Please enter less stringent search criteria')
+  }
+  
+
+};
 
 //this sets up the express server to respond to the homepage with this request. 
 app.get('/', (req, res)=>{
+  
   res.send("This is the movie DB")
   
-})
-
+});
 app.get('/movie', handleGetRequests);
-
 
