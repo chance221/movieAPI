@@ -81,16 +81,18 @@ let handleGetRequests = (req, res) => {
   }
     
   if(req.query.country){
-
+    console.log(req.query.country)
     response = response.filter( movies => {
       return movies.country.toLowerCase().includes(req.query.country.toLowerCase())
     })
 
   }
 
-  if(req.query.rating){
-    response = response.filter((movies, index) => {
+  if(req.query.avg_vote){
+    response = response.filter((movies) => {
+      console.log(movies.avg_vote)
       return checkRating(movies.avg_vote)
+      
     })
 
   }
@@ -102,8 +104,6 @@ let handleGetRequests = (req, res) => {
   else{
     res.send('No results found. Please enter less stringent search criteria')
   }
-  
-
 };
 
 //this sets up the express server to respond to the homepage with this request. 
